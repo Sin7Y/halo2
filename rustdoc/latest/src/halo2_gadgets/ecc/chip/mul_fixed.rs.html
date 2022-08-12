@@ -1,5 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `halo2_gadgets/src/ecc/chip/mul_fixed.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mul_fixed.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script src="../../../../crates.js"></script><script defer src="../../../../main.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script>
-    <noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/katex.min.css" integrity="sha384-9eLZqc9ds8eNjO3TmqPeYcDj8n+Qfa4nuSiGYa6DjLNcv9BtN69ZIulL9+8CqC9Y" crossorigin="anonymous">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `halo2_gadgets/src/ecc/chip/mul_fixed.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mul_fixed.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/katex.min.css" integrity="sha384-9eLZqc9ds8eNjO3TmqPeYcDj8n+Qfa4nuSiGYa6DjLNcv9BtN69ZIulL9+8CqC9Y" crossorigin="anonymous">
 <script src="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/katex.min.js"                  integrity="sha384-K3vbOmF2BtaVai+Qk37uypf7VrgBubhQreNQe9aGsz9lB63dIFiQVlJbr92dw2Lx" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/contrib/auto-render.min.js"    integrity="sha384-kmZOZB5ObwgQnS/DuDg6TScgOiWWBiVt0plIRkZCmE6rDZGrEOQeHM5PcHi+nyqe" crossorigin="anonymous"></script>
 <script>
@@ -14,107 +13,105 @@
         });
     });
 </script>
-</head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a class="sidebar-logo" href="../../../../halo2_gadgets/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div>
-        </a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../halo2_gadgets/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><form class="search-form"><div class="search-container"><div>
-                                <input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../../../wheel.svg"></a></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
-<span id="2">  2</span>
-<span id="3">  3</span>
-<span id="4">  4</span>
-<span id="5">  5</span>
-<span id="6">  6</span>
-<span id="7">  7</span>
-<span id="8">  8</span>
-<span id="9">  9</span>
-<span id="10"> 10</span>
-<span id="11"> 11</span>
-<span id="12"> 12</span>
-<span id="13"> 13</span>
-<span id="14"> 14</span>
-<span id="15"> 15</span>
-<span id="16"> 16</span>
-<span id="17"> 17</span>
-<span id="18"> 18</span>
-<span id="19"> 19</span>
-<span id="20"> 20</span>
-<span id="21"> 21</span>
-<span id="22"> 22</span>
-<span id="23"> 23</span>
-<span id="24"> 24</span>
-<span id="25"> 25</span>
-<span id="26"> 26</span>
-<span id="27"> 27</span>
-<span id="28"> 28</span>
-<span id="29"> 29</span>
-<span id="30"> 30</span>
-<span id="31"> 31</span>
-<span id="32"> 32</span>
-<span id="33"> 33</span>
-<span id="34"> 34</span>
-<span id="35"> 35</span>
-<span id="36"> 36</span>
-<span id="37"> 37</span>
-<span id="38"> 38</span>
-<span id="39"> 39</span>
-<span id="40"> 40</span>
-<span id="41"> 41</span>
-<span id="42"> 42</span>
-<span id="43"> 43</span>
-<span id="44"> 44</span>
-<span id="45"> 45</span>
-<span id="46"> 46</span>
-<span id="47"> 47</span>
-<span id="48"> 48</span>
-<span id="49"> 49</span>
-<span id="50"> 50</span>
-<span id="51"> 51</span>
-<span id="52"> 52</span>
-<span id="53"> 53</span>
-<span id="54"> 54</span>
-<span id="55"> 55</span>
-<span id="56"> 56</span>
-<span id="57"> 57</span>
-<span id="58"> 58</span>
-<span id="59"> 59</span>
-<span id="60"> 60</span>
-<span id="61"> 61</span>
-<span id="62"> 62</span>
-<span id="63"> 63</span>
-<span id="64"> 64</span>
-<span id="65"> 65</span>
-<span id="66"> 66</span>
-<span id="67"> 67</span>
-<span id="68"> 68</span>
-<span id="69"> 69</span>
-<span id="70"> 70</span>
-<span id="71"> 71</span>
-<span id="72"> 72</span>
-<span id="73"> 73</span>
-<span id="74"> 74</span>
-<span id="75"> 75</span>
-<span id="76"> 76</span>
-<span id="77"> 77</span>
-<span id="78"> 78</span>
-<span id="79"> 79</span>
-<span id="80"> 80</span>
-<span id="81"> 81</span>
-<span id="82"> 82</span>
-<span id="83"> 83</span>
-<span id="84"> 84</span>
-<span id="85"> 85</span>
-<span id="86"> 86</span>
-<span id="87"> 87</span>
-<span id="88"> 88</span>
-<span id="89"> 89</span>
-<span id="90"> 90</span>
-<span id="91"> 91</span>
-<span id="92"> 92</span>
-<span id="93"> 93</span>
-<span id="94"> 94</span>
-<span id="95"> 95</span>
-<span id="96"> 96</span>
-<span id="97"> 97</span>
-<span id="98"> 98</span>
-<span id="99"> 99</span>
+</head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../halo2_gadgets/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../halo2_gadgets/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../halo2_gadgets/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<span id="2">2</span>
+<span id="3">3</span>
+<span id="4">4</span>
+<span id="5">5</span>
+<span id="6">6</span>
+<span id="7">7</span>
+<span id="8">8</span>
+<span id="9">9</span>
+<span id="10">10</span>
+<span id="11">11</span>
+<span id="12">12</span>
+<span id="13">13</span>
+<span id="14">14</span>
+<span id="15">15</span>
+<span id="16">16</span>
+<span id="17">17</span>
+<span id="18">18</span>
+<span id="19">19</span>
+<span id="20">20</span>
+<span id="21">21</span>
+<span id="22">22</span>
+<span id="23">23</span>
+<span id="24">24</span>
+<span id="25">25</span>
+<span id="26">26</span>
+<span id="27">27</span>
+<span id="28">28</span>
+<span id="29">29</span>
+<span id="30">30</span>
+<span id="31">31</span>
+<span id="32">32</span>
+<span id="33">33</span>
+<span id="34">34</span>
+<span id="35">35</span>
+<span id="36">36</span>
+<span id="37">37</span>
+<span id="38">38</span>
+<span id="39">39</span>
+<span id="40">40</span>
+<span id="41">41</span>
+<span id="42">42</span>
+<span id="43">43</span>
+<span id="44">44</span>
+<span id="45">45</span>
+<span id="46">46</span>
+<span id="47">47</span>
+<span id="48">48</span>
+<span id="49">49</span>
+<span id="50">50</span>
+<span id="51">51</span>
+<span id="52">52</span>
+<span id="53">53</span>
+<span id="54">54</span>
+<span id="55">55</span>
+<span id="56">56</span>
+<span id="57">57</span>
+<span id="58">58</span>
+<span id="59">59</span>
+<span id="60">60</span>
+<span id="61">61</span>
+<span id="62">62</span>
+<span id="63">63</span>
+<span id="64">64</span>
+<span id="65">65</span>
+<span id="66">66</span>
+<span id="67">67</span>
+<span id="68">68</span>
+<span id="69">69</span>
+<span id="70">70</span>
+<span id="71">71</span>
+<span id="72">72</span>
+<span id="73">73</span>
+<span id="74">74</span>
+<span id="75">75</span>
+<span id="76">76</span>
+<span id="77">77</span>
+<span id="78">78</span>
+<span id="79">79</span>
+<span id="80">80</span>
+<span id="81">81</span>
+<span id="82">82</span>
+<span id="83">83</span>
+<span id="84">84</span>
+<span id="85">85</span>
+<span id="86">86</span>
+<span id="87">87</span>
+<span id="88">88</span>
+<span id="89">89</span>
+<span id="90">90</span>
+<span id="91">91</span>
+<span id="92">92</span>
+<span id="93">93</span>
+<span id="94">94</span>
+<span id="95">95</span>
+<span id="96">96</span>
+<span id="97">97</span>
+<span id="98">98</span>
+<span id="99">99</span>
 <span id="100">100</span>
 <span id="101">101</span>
 <span id="102">102</span>
@@ -517,10 +514,6 @@
 <span id="499">499</span>
 <span id="500">500</span>
 <span id="501">501</span>
-<span id="502">502</span>
-<span id="503">503</span>
-<span id="504">504</span>
-<span id="505">505</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::{
     <span class="ident">add</span>, <span class="ident">add_incomplete</span>, <span class="ident">EccBaseFieldElemFixed</span>, <span class="ident">EccScalarFixed</span>, <span class="ident">EccScalarFixedShort</span>, <span class="ident">FixedPoint</span>,
     <span class="ident">NonIdentityEccPoint</span>, <span class="ident">FIXED_BASE_WINDOW_SIZE</span>, <span class="ident">H</span>,
@@ -529,10 +522,16 @@
 
 <span class="kw">use</span> <span class="ident">std::marker::PhantomData</span>;
 
-<span class="kw">use</span> <span class="ident">group</span>::{<span class="ident">ff::PrimeField</span>, <span class="ident">Curve</span>};
+<span class="kw">use</span> <span class="ident">group</span>::{
+    <span class="ident">ff</span>::{<span class="ident">PrimeField</span>, <span class="ident">PrimeFieldBits</span>},
+    <span class="ident">Curve</span>,
+};
 <span class="kw">use</span> <span class="ident">halo2_proofs</span>::{
-    <span class="ident">circuit</span>::{<span class="ident">AssignedCell</span>, <span class="ident">Region</span>},
-    <span class="ident">plonk</span>::{<span class="ident">Advice</span>, <span class="ident">Column</span>, <span class="ident">ConstraintSystem</span>, <span class="ident">Error</span>, <span class="ident">Expression</span>, <span class="ident">Fixed</span>, <span class="ident">Selector</span>, <span class="ident">VirtualCells</span>},
+    <span class="ident">circuit</span>::{<span class="ident">AssignedCell</span>, <span class="ident">Region</span>, <span class="ident">Value</span>},
+    <span class="ident">plonk</span>::{
+        <span class="ident">Advice</span>, <span class="ident">Column</span>, <span class="ident">ConstraintSystem</span>, <span class="ident">Constraints</span>, <span class="ident">Error</span>, <span class="ident">Expression</span>, <span class="ident">Fixed</span>, <span class="ident">Selector</span>,
+        <span class="ident">VirtualCells</span>,
+    },
     <span class="ident">poly::Rotation</span>,
 };
 <span class="kw">use</span> <span class="ident">lazy_static::lazy_static</span>;
@@ -562,10 +561,6 @@
     <span class="comment">// Decomposition of an `n-1`-bit scalar into `k`-bit windows:</span>
     <span class="comment">// a = a_0 + 2^k(a_1) + 2^{2k}(a_2) + ... + 2^{(n-1)k}(a_{n-1})</span>
     <span class="ident">window</span>: <span class="ident">Column</span><span class="op">&lt;</span><span class="ident">Advice</span><span class="op">&gt;</span>,
-    <span class="comment">// x-coordinate of the multiple of the fixed base at the current window.</span>
-    <span class="ident">x_p</span>: <span class="ident">Column</span><span class="op">&lt;</span><span class="ident">Advice</span><span class="op">&gt;</span>,
-    <span class="comment">// y-coordinate of the multiple of the fixed base at the current window.</span>
-    <span class="ident">y_p</span>: <span class="ident">Column</span><span class="op">&lt;</span><span class="ident">Advice</span><span class="op">&gt;</span>,
     <span class="comment">// y-coordinate of accumulator (only used in the final row).</span>
     <span class="ident">u</span>: <span class="ident">Column</span><span class="op">&lt;</span><span class="ident">Advice</span><span class="op">&gt;</span>,
     <span class="comment">// Configuration for `add`</span>
@@ -581,8 +576,6 @@
         <span class="ident">meta</span>: <span class="kw-2">&amp;mut</span> <span class="ident">ConstraintSystem</span><span class="op">&lt;</span><span class="ident">pallas::Base</span><span class="op">&gt;</span>,
         <span class="ident">lagrange_coeffs</span>: [<span class="ident">Column</span><span class="op">&lt;</span><span class="ident">Fixed</span><span class="op">&gt;</span>; <span class="ident">H</span>],
         <span class="ident">window</span>: <span class="ident">Column</span><span class="op">&lt;</span><span class="ident">Advice</span><span class="op">&gt;</span>,
-        <span class="ident">x_p</span>: <span class="ident">Column</span><span class="op">&lt;</span><span class="ident">Advice</span><span class="op">&gt;</span>,
-        <span class="ident">y_p</span>: <span class="ident">Column</span><span class="op">&lt;</span><span class="ident">Advice</span><span class="op">&gt;</span>,
         <span class="ident">u</span>: <span class="ident">Column</span><span class="op">&lt;</span><span class="ident">Advice</span><span class="op">&gt;</span>,
         <span class="ident">add_config</span>: <span class="ident">add::Config</span>,
         <span class="ident">add_incomplete_config</span>: <span class="ident">add_incomplete::Config</span>,
@@ -598,34 +591,22 @@
             <span class="ident">lagrange_coeffs</span>,
             <span class="ident">fixed_z</span>: <span class="ident">meta</span>.<span class="ident">fixed_column</span>(),
             <span class="ident">window</span>,
-            <span class="ident">x_p</span>,
-            <span class="ident">y_p</span>,
             <span class="ident">u</span>,
             <span class="ident">add_config</span>,
             <span class="ident">add_incomplete_config</span>,
             <span class="ident">_marker</span>: <span class="ident">PhantomData</span>,
         };
 
-        <span class="comment">// Check relationships between this config and `add_config`.</span>
+        <span class="comment">// Check relationships between `add_config` and `add_incomplete_config`.</span>
         <span class="macro">assert_eq!</span>(
-            <span class="ident">config</span>.<span class="ident">x_p</span>, <span class="ident">config</span>.<span class="ident">add_config</span>.<span class="ident">x_p</span>,
-            <span class="string">&quot;add is used internally in mul_fixed.&quot;</span>
+            <span class="ident">config</span>.<span class="ident">add_config</span>.<span class="ident">x_p</span>, <span class="ident">config</span>.<span class="ident">add_incomplete_config</span>.<span class="ident">x_p</span>,
+            <span class="string">&quot;add and add_incomplete are used internally in mul_fixed.&quot;</span>
         );
         <span class="macro">assert_eq!</span>(
-            <span class="ident">config</span>.<span class="ident">y_p</span>, <span class="ident">config</span>.<span class="ident">add_config</span>.<span class="ident">y_p</span>,
-            <span class="string">&quot;add is used internally in mul_fixed.&quot;</span>
+            <span class="ident">config</span>.<span class="ident">add_config</span>.<span class="ident">y_p</span>, <span class="ident">config</span>.<span class="ident">add_incomplete_config</span>.<span class="ident">y_p</span>,
+            <span class="string">&quot;add and add_incomplete are used internally in mul_fixed.&quot;</span>
         );
-
-        <span class="comment">// Check relationships between this config and `add_incomplete_config`.</span>
-        <span class="macro">assert_eq!</span>(
-            <span class="ident">config</span>.<span class="ident">x_p</span>, <span class="ident">config</span>.<span class="ident">add_incomplete_config</span>.<span class="ident">x_p</span>,
-            <span class="string">&quot;add_incomplete is used internally in mul_fixed.&quot;</span>
-        );
-        <span class="macro">assert_eq!</span>(
-            <span class="ident">config</span>.<span class="ident">y_p</span>, <span class="ident">config</span>.<span class="ident">add_incomplete_config</span>.<span class="ident">y_p</span>,
-            <span class="string">&quot;add_incomplete is used internally in mul_fixed.&quot;</span>
-        );
-        <span class="kw">for</span> <span class="ident">advice</span> <span class="kw">in</span> [<span class="ident">config</span>.<span class="ident">x_p</span>, <span class="ident">config</span>.<span class="ident">y_p</span>, <span class="ident">config</span>.<span class="ident">window</span>, <span class="ident">config</span>.<span class="ident">u</span>].<span class="ident">iter</span>() {
+        <span class="kw">for</span> <span class="ident">advice</span> <span class="kw">in</span> [<span class="ident">config</span>.<span class="ident">window</span>, <span class="ident">config</span>.<span class="ident">u</span>].<span class="ident">iter</span>() {
             <span class="macro">assert_ne!</span>(
                 <span class="kw-2">*</span><span class="ident">advice</span>, <span class="ident">config</span>.<span class="ident">add_config</span>.<span class="ident">x_qr</span>,
                 <span class="string">&quot;Do not overlap with output columns of add.&quot;</span>
@@ -662,19 +643,19 @@
             <span class="comment">// =&gt; a_i = z_i - z_{i+1} * 2^3</span>
             <span class="kw">let</span> <span class="ident">word</span> <span class="op">=</span> <span class="ident">z_cur</span> <span class="op">-</span> <span class="ident">z_next</span> <span class="op">*</span> <span class="ident">pallas::Base::from</span>(<span class="ident">H</span> <span class="kw">as</span> <span class="ident">u64</span>);
 
-            <span class="self">self</span>.<span class="ident">coords_check</span>(<span class="ident">meta</span>, <span class="ident">q_mul_fixed_running_sum</span>, <span class="ident">word</span>)
+            <span class="ident">Constraints::with_selector</span>(<span class="ident">q_mul_fixed_running_sum</span>, <span class="self">self</span>.<span class="ident">coords_check</span>(<span class="ident">meta</span>, <span class="ident">word</span>))
         });
     }
 
+    <span class="doccomment">/// [Specification](https://p.z.cash/halo2-0.1:ecc-fixed-mul-coordinates).</span>
     <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::op_ref</span>)]</span>
     <span class="kw">fn</span> <span class="ident">coords_check</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">meta</span>: <span class="kw-2">&amp;mut</span> <span class="ident">VirtualCells</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">pallas::Base</span><span class="op">&gt;</span>,
-        <span class="ident">toggle</span>: <span class="ident">Expression</span><span class="op">&lt;</span><span class="ident">pallas::Base</span><span class="op">&gt;</span>,
         <span class="ident">window</span>: <span class="ident">Expression</span><span class="op">&lt;</span><span class="ident">pallas::Base</span><span class="op">&gt;</span>,
     ) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="ident">Expression</span><span class="op">&lt;</span><span class="ident">pallas::Base</span><span class="op">&gt;</span>)<span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">y_p</span> <span class="op">=</span> <span class="ident">meta</span>.<span class="ident">query_advice</span>(<span class="self">self</span>.<span class="ident">y_p</span>, <span class="ident">Rotation::cur</span>());
-        <span class="kw">let</span> <span class="ident">x_p</span> <span class="op">=</span> <span class="ident">meta</span>.<span class="ident">query_advice</span>(<span class="self">self</span>.<span class="ident">x_p</span>, <span class="ident">Rotation::cur</span>());
+        <span class="kw">let</span> <span class="ident">y_p</span> <span class="op">=</span> <span class="ident">meta</span>.<span class="ident">query_advice</span>(<span class="self">self</span>.<span class="ident">add_config</span>.<span class="ident">y_p</span>, <span class="ident">Rotation::cur</span>());
+        <span class="kw">let</span> <span class="ident">x_p</span> <span class="op">=</span> <span class="ident">meta</span>.<span class="ident">query_advice</span>(<span class="self">self</span>.<span class="ident">add_config</span>.<span class="ident">x_p</span>, <span class="ident">Rotation::cur</span>());
         <span class="kw">let</span> <span class="ident">z</span> <span class="op">=</span> <span class="ident">meta</span>.<span class="ident">query_fixed</span>(<span class="self">self</span>.<span class="ident">fixed_z</span>, <span class="ident">Rotation::cur</span>());
         <span class="kw">let</span> <span class="ident">u</span> <span class="op">=</span> <span class="ident">meta</span>.<span class="ident">query_advice</span>(<span class="self">self</span>.<span class="ident">u</span>, <span class="ident">Rotation::cur</span>());
 
@@ -702,9 +683,9 @@
             <span class="ident">y_p</span>.<span class="ident">square</span>() <span class="op">-</span> <span class="ident">x_p</span>.<span class="ident">clone</span>().<span class="ident">square</span>() <span class="op">*</span> <span class="ident">x_p</span> <span class="op">-</span> <span class="ident">Expression::Constant</span>(<span class="ident">pallas::Affine::b</span>());
 
         <span class="macro">vec!</span>[
-            (<span class="string">&quot;check x&quot;</span>, <span class="ident">toggle</span>.<span class="ident">clone</span>() <span class="op">*</span> <span class="ident">x_check</span>),
-            (<span class="string">&quot;check y&quot;</span>, <span class="ident">toggle</span>.<span class="ident">clone</span>() <span class="op">*</span> <span class="ident">y_check</span>),
-            (<span class="string">&quot;on-curve&quot;</span>, <span class="ident">toggle</span> <span class="op">*</span> <span class="ident">on_curve</span>),
+            (<span class="string">&quot;check x&quot;</span>, <span class="ident">x_check</span>),
+            (<span class="string">&quot;check y&quot;</span>, <span class="ident">y_check</span>),
+            (<span class="string">&quot;on-curve&quot;</span>, <span class="ident">on_curve</span>),
         ]
     }
 
@@ -726,12 +707,13 @@
         <span class="comment">// Process all windows excluding least and most significant windows</span>
         <span class="kw">let</span> <span class="ident">acc</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">add_incomplete</span>::<span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">NUM_WINDOWS</span><span class="op">&gt;</span>(<span class="ident">region</span>, <span class="ident">offset</span>, <span class="ident">acc</span>, <span class="ident">base</span>, <span class="ident">scalar</span>)<span class="question-mark">?</span>;
 
-        <span class="comment">// Process most significant window using complete addition</span>
+        <span class="comment">// Process most significant window</span>
         <span class="kw">let</span> <span class="ident">mul_b</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">process_msb</span>::<span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">NUM_WINDOWS</span><span class="op">&gt;</span>(<span class="ident">region</span>, <span class="ident">offset</span>, <span class="ident">base</span>, <span class="ident">scalar</span>)<span class="question-mark">?</span>;
 
         <span class="prelude-val">Ok</span>((<span class="ident">acc</span>, <span class="ident">mul_b</span>))
     }
 
+    <span class="doccomment">/// [Specification](https://p.z.cash/halo2-0.1:ecc-fixed-mul-load-base).</span>
     <span class="kw">fn</span> <span class="ident">assign_fixed_constants</span><span class="op">&lt;</span><span class="ident">F</span>: <span class="ident">FixedPoint</span><span class="op">&lt;</span><span class="ident">pallas::Affine</span><span class="op">&gt;</span>, <span class="kw">const</span> <span class="ident">NUM_WINDOWS</span>: <span class="ident">usize</span><span class="op">&gt;</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">region</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Region</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">pallas::Base</span><span class="op">&gt;</span>,
@@ -770,7 +752,7 @@
                             <span class="ident">constants</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">build_constants</span>());
                         }
                         <span class="kw">let</span> <span class="ident">lagrange_coeffs</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">constants</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap</span>().<span class="number">0</span>;
-                        <span class="prelude-val">Ok</span>(<span class="ident">lagrange_coeffs</span>[<span class="ident">window</span>][<span class="ident">k</span>])
+                        <span class="ident">Value::known</span>(<span class="ident">lagrange_coeffs</span>[<span class="ident">window</span>][<span class="ident">k</span>])
                     },
                 )<span class="question-mark">?</span>;
             }
@@ -782,7 +764,7 @@
                 <span class="ident">window</span> <span class="op">+</span> <span class="ident">offset</span>,
                 <span class="op">|</span><span class="op">|</span> {
                     <span class="kw">let</span> <span class="ident">z</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">constants</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap</span>().<span class="number">1</span>;
-                    <span class="prelude-val">Ok</span>(<span class="ident">pallas::Base::from</span>(<span class="ident">z</span>[<span class="ident">window</span>]))
+                    <span class="ident">Value::known</span>(<span class="ident">pallas::Base::from</span>(<span class="ident">z</span>[<span class="ident">window</span>]))
                 },
             )<span class="question-mark">?</span>;
         }
@@ -790,47 +772,47 @@
         <span class="prelude-val">Ok</span>(())
     }
 
+    <span class="doccomment">/// Assigns the values used to process a window.</span>
     <span class="kw">fn</span> <span class="ident">process_window</span><span class="op">&lt;</span><span class="ident">F</span>: <span class="ident">FixedPoint</span><span class="op">&lt;</span><span class="ident">pallas::Affine</span><span class="op">&gt;</span>, <span class="kw">const</span> <span class="ident">NUM_WINDOWS</span>: <span class="ident">usize</span><span class="op">&gt;</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">region</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Region</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">pallas::Base</span><span class="op">&gt;</span>,
         <span class="ident">offset</span>: <span class="ident">usize</span>,
         <span class="ident">w</span>: <span class="ident">usize</span>,
-        <span class="ident">k</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">pallas::Scalar</span><span class="op">&gt;</span>,
-        <span class="ident">k_usize</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>,
+        <span class="ident">k_usize</span>: <span class="ident">Value</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>,
+        <span class="ident">window_scalar</span>: <span class="ident">Value</span><span class="op">&lt;</span><span class="ident">pallas::Scalar</span><span class="op">&gt;</span>,
         <span class="ident">base</span>: <span class="kw-2">&amp;</span><span class="ident">F</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">NonIdentityEccPoint</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">base_value</span> <span class="op">=</span> <span class="ident">base</span>.<span class="ident">generator</span>();
         <span class="kw">let</span> <span class="ident">base_u</span> <span class="op">=</span> <span class="ident">base</span>.<span class="ident">u</span>();
         <span class="macro">assert_eq!</span>(<span class="ident">base_u</span>.<span class="ident">len</span>(), <span class="ident">NUM_WINDOWS</span>);
 
-        <span class="comment">// Compute [(k_w + 2) ⋅ 8^w]B</span>
+        <span class="comment">// Compute [window_scalar]B</span>
         <span class="kw">let</span> <span class="ident">mul_b</span> <span class="op">=</span> {
-            <span class="kw">let</span> <span class="ident">mul_b</span> <span class="op">=</span>
-                <span class="ident">k</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">k</span><span class="op">|</span> <span class="ident">base_value</span> <span class="op">*</span> (<span class="ident">k</span> <span class="op">+</span> <span class="kw-2">*</span><span class="ident">TWO_SCALAR</span>) <span class="op">*</span> <span class="ident">H_SCALAR</span>.<span class="ident">pow</span>(<span class="kw-2">&amp;</span>[<span class="ident">w</span> <span class="kw">as</span> <span class="ident">u64</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>]));
+            <span class="kw">let</span> <span class="ident">mul_b</span> <span class="op">=</span> <span class="ident">window_scalar</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">scalar</span><span class="op">|</span> <span class="ident">base_value</span> <span class="op">*</span> <span class="ident">scalar</span>);
             <span class="kw">let</span> <span class="ident">mul_b</span> <span class="op">=</span> <span class="ident">mul_b</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">mul_b</span><span class="op">|</span> <span class="ident">mul_b</span>.<span class="ident">to_affine</span>().<span class="ident">coordinates</span>().<span class="ident">unwrap</span>());
 
             <span class="kw">let</span> <span class="ident">x</span> <span class="op">=</span> <span class="ident">mul_b</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">mul_b</span><span class="op">|</span> {
                 <span class="kw">let</span> <span class="ident">x</span> <span class="op">=</span> <span class="kw-2">*</span><span class="ident">mul_b</span>.<span class="ident">x</span>();
                 <span class="macro">assert!</span>(<span class="ident">x</span> <span class="op">!</span><span class="op">=</span> <span class="ident">pallas::Base::zero</span>());
-                <span class="ident">x</span>
+                <span class="ident">x</span>.<span class="ident">into</span>()
             });
             <span class="kw">let</span> <span class="ident">x</span> <span class="op">=</span> <span class="ident">region</span>.<span class="ident">assign_advice</span>(
                 <span class="op">|</span><span class="op">|</span> <span class="macro">format!</span>(<span class="string">&quot;mul_b_x, window {}&quot;</span>, <span class="ident">w</span>),
-                <span class="self">self</span>.<span class="ident">x_p</span>,
+                <span class="self">self</span>.<span class="ident">add_config</span>.<span class="ident">x_p</span>,
                 <span class="ident">offset</span> <span class="op">+</span> <span class="ident">w</span>,
-                <span class="op">|</span><span class="op">|</span> <span class="ident">x</span>.<span class="ident">ok_or</span>(<span class="ident">Error::Synthesis</span>),
+                <span class="op">|</span><span class="op">|</span> <span class="ident">x</span>,
             )<span class="question-mark">?</span>;
 
             <span class="kw">let</span> <span class="ident">y</span> <span class="op">=</span> <span class="ident">mul_b</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">mul_b</span><span class="op">|</span> {
                 <span class="kw">let</span> <span class="ident">y</span> <span class="op">=</span> <span class="kw-2">*</span><span class="ident">mul_b</span>.<span class="ident">y</span>();
                 <span class="macro">assert!</span>(<span class="ident">y</span> <span class="op">!</span><span class="op">=</span> <span class="ident">pallas::Base::zero</span>());
-                <span class="ident">y</span>
+                <span class="ident">y</span>.<span class="ident">into</span>()
             });
             <span class="kw">let</span> <span class="ident">y</span> <span class="op">=</span> <span class="ident">region</span>.<span class="ident">assign_advice</span>(
                 <span class="op">|</span><span class="op">|</span> <span class="macro">format!</span>(<span class="string">&quot;mul_b_y, window {}&quot;</span>, <span class="ident">w</span>),
-                <span class="self">self</span>.<span class="ident">y_p</span>,
+                <span class="self">self</span>.<span class="ident">add_config</span>.<span class="ident">y_p</span>,
                 <span class="ident">offset</span> <span class="op">+</span> <span class="ident">w</span>,
-                <span class="op">|</span><span class="op">|</span> <span class="ident">y</span>.<span class="ident">ok_or</span>(<span class="ident">Error::Synthesis</span>),
+                <span class="op">|</span><span class="op">|</span> <span class="ident">y</span>,
             )<span class="question-mark">?</span>;
 
             <span class="ident">NonIdentityEccPoint</span> { <span class="ident">x</span>, <span class="ident">y</span> }
@@ -838,7 +820,7 @@
 
         <span class="comment">// Assign u = (y_p + z_w).sqrt()</span>
         <span class="kw">let</span> <span class="ident">u_val</span> <span class="op">=</span> <span class="ident">k_usize</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">k</span><span class="op">|</span> <span class="ident">pallas::Base::from_repr</span>(<span class="ident">base_u</span>[<span class="ident">w</span>][<span class="ident">k</span>]).<span class="ident">unwrap</span>());
-        <span class="ident">region</span>.<span class="ident">assign_advice</span>(<span class="op">|</span><span class="op">|</span> <span class="string">&quot;u&quot;</span>, <span class="self">self</span>.<span class="ident">u</span>, <span class="ident">offset</span> <span class="op">+</span> <span class="ident">w</span>, <span class="op">|</span><span class="op">|</span> <span class="ident">u_val</span>.<span class="ident">ok_or</span>(<span class="ident">Error::Synthesis</span>))<span class="question-mark">?</span>;
+        <span class="ident">region</span>.<span class="ident">assign_advice</span>(<span class="op">|</span><span class="op">|</span> <span class="string">&quot;u&quot;</span>, <span class="self">self</span>.<span class="ident">u</span>, <span class="ident">offset</span> <span class="op">+</span> <span class="ident">w</span>, <span class="op">|</span><span class="op">|</span> <span class="ident">u_val</span>)<span class="question-mark">?</span>;
 
         <span class="prelude-val">Ok</span>(<span class="ident">mul_b</span>)
     }
@@ -856,7 +838,7 @@
         <span class="kw">let</span> <span class="ident">w</span> <span class="op">=</span> <span class="number">0</span>;
         <span class="kw">let</span> <span class="ident">k0</span> <span class="op">=</span> <span class="ident">scalar</span>.<span class="ident">windows_field</span>()[<span class="number">0</span>];
         <span class="kw">let</span> <span class="ident">k0_usize</span> <span class="op">=</span> <span class="ident">scalar</span>.<span class="ident">windows_usize</span>()[<span class="number">0</span>];
-        <span class="self">self</span>.<span class="ident">process_window</span>::<span class="op">&lt;</span><span class="kw">_</span>, <span class="ident">NUM_WINDOWS</span><span class="op">&gt;</span>(<span class="ident">region</span>, <span class="ident">offset</span>, <span class="ident">w</span>, <span class="ident">k0</span>, <span class="ident">k0_usize</span>, <span class="ident">base</span>)
+        <span class="self">self</span>.<span class="ident">process_lower_bits</span>::<span class="op">&lt;</span><span class="kw">_</span>, <span class="ident">NUM_WINDOWS</span><span class="op">&gt;</span>(<span class="ident">region</span>, <span class="ident">offset</span>, <span class="ident">w</span>, <span class="ident">k0</span>, <span class="ident">k0_usize</span>, <span class="ident">base</span>)
     }
 
     <span class="kw">fn</span> <span class="ident">add_incomplete</span><span class="op">&lt;</span><span class="ident">F</span>: <span class="ident">FixedPoint</span><span class="op">&lt;</span><span class="ident">pallas::Affine</span><span class="op">&gt;</span>, <span class="kw">const</span> <span class="ident">NUM_WINDOWS</span>: <span class="ident">usize</span><span class="op">&gt;</span>(
@@ -869,19 +851,28 @@
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">NonIdentityEccPoint</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">scalar_windows_field</span> <span class="op">=</span> <span class="ident">scalar</span>.<span class="ident">windows_field</span>();
         <span class="kw">let</span> <span class="ident">scalar_windows_usize</span> <span class="op">=</span> <span class="ident">scalar</span>.<span class="ident">windows_usize</span>();
+        <span class="macro">assert_eq!</span>(<span class="ident">scalar_windows_field</span>.<span class="ident">len</span>(), <span class="ident">NUM_WINDOWS</span>);
 
-        <span class="kw">for</span> (<span class="ident">w</span>, (<span class="ident">k</span>, <span class="ident">k_usize</span>)) <span class="kw">in</span> <span class="ident">scalar_windows_field</span>[..(<span class="ident">scalar_windows_field</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="number">1</span>)]
-            .<span class="ident">iter</span>()
-            .<span class="ident">zip</span>(<span class="ident">scalar_windows_usize</span>[..(<span class="ident">scalar_windows_field</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="number">1</span>)].<span class="ident">iter</span>())
+        <span class="kw">for</span> (<span class="ident">w</span>, (<span class="ident">k</span>, <span class="ident">k_usize</span>)) <span class="kw">in</span> <span class="ident">scalar_windows_field</span>
+            .<span class="ident">into_iter</span>()
+            .<span class="ident">zip</span>(<span class="ident">scalar_windows_usize</span>)
             .<span class="ident">enumerate</span>()
+            <span class="comment">// The MSB is processed separately.</span>
+            .<span class="ident">take</span>(<span class="ident">NUM_WINDOWS</span> <span class="op">-</span> <span class="number">1</span>)
             <span class="comment">// Skip k_0 (already processed).</span>
             .<span class="ident">skip</span>(<span class="number">1</span>)
         {
             <span class="comment">// Compute [(k_w + 2) ⋅ 8^w]B</span>
+            <span class="comment">//</span>
+            <span class="comment">// This assigns the coordinates of the returned point into the input cells for</span>
+            <span class="comment">// the incomplete addition gate, which will then copy them into themselves.</span>
             <span class="kw">let</span> <span class="ident">mul_b</span> <span class="op">=</span>
-                <span class="self">self</span>.<span class="ident">process_window</span>::<span class="op">&lt;</span><span class="kw">_</span>, <span class="ident">NUM_WINDOWS</span><span class="op">&gt;</span>(<span class="ident">region</span>, <span class="ident">offset</span>, <span class="ident">w</span>, <span class="kw-2">*</span><span class="ident">k</span>, <span class="kw-2">*</span><span class="ident">k_usize</span>, <span class="ident">base</span>)<span class="question-mark">?</span>;
+                <span class="self">self</span>.<span class="ident">process_lower_bits</span>::<span class="op">&lt;</span><span class="kw">_</span>, <span class="ident">NUM_WINDOWS</span><span class="op">&gt;</span>(<span class="ident">region</span>, <span class="ident">offset</span>, <span class="ident">w</span>, <span class="ident">k</span>, <span class="ident">k_usize</span>, <span class="ident">base</span>)<span class="question-mark">?</span>;
 
-            <span class="comment">// Add to the accumulator</span>
+            <span class="comment">// Add to the accumulator.</span>
+            <span class="comment">//</span>
+            <span class="comment">// After the first loop, the accumulator will already be in the input cells</span>
+            <span class="comment">// for the incomplete addition gate, and will be copied into themselves.</span>
             <span class="ident">acc</span> <span class="op">=</span> <span class="self">self</span>
                 .<span class="ident">add_incomplete_config</span>
                 .<span class="ident">assign_region</span>(<span class="kw-2">&amp;</span><span class="ident">mul_b</span>, <span class="kw-2">&amp;</span><span class="ident">acc</span>, <span class="ident">offset</span> <span class="op">+</span> <span class="ident">w</span>, <span class="ident">region</span>)<span class="question-mark">?</span>;
@@ -889,6 +880,23 @@
         <span class="prelude-val">Ok</span>(<span class="ident">acc</span>)
     }
 
+    <span class="doccomment">/// Assigns the values used to process a window that does not contain the MSB.</span>
+    <span class="kw">fn</span> <span class="ident">process_lower_bits</span><span class="op">&lt;</span><span class="ident">F</span>: <span class="ident">FixedPoint</span><span class="op">&lt;</span><span class="ident">pallas::Affine</span><span class="op">&gt;</span>, <span class="kw">const</span> <span class="ident">NUM_WINDOWS</span>: <span class="ident">usize</span><span class="op">&gt;</span>(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        <span class="ident">region</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Region</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">pallas::Base</span><span class="op">&gt;</span>,
+        <span class="ident">offset</span>: <span class="ident">usize</span>,
+        <span class="ident">w</span>: <span class="ident">usize</span>,
+        <span class="ident">k</span>: <span class="ident">Value</span><span class="op">&lt;</span><span class="ident">pallas::Scalar</span><span class="op">&gt;</span>,
+        <span class="ident">k_usize</span>: <span class="ident">Value</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>,
+        <span class="ident">base</span>: <span class="kw-2">&amp;</span><span class="ident">F</span>,
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">NonIdentityEccPoint</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
+        <span class="comment">// `scalar = [(k_w + 2) ⋅ 8^w]</span>
+        <span class="kw">let</span> <span class="ident">scalar</span> <span class="op">=</span> <span class="ident">k</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">k</span><span class="op">|</span> (<span class="ident">k</span> <span class="op">+</span> <span class="kw-2">*</span><span class="ident">TWO_SCALAR</span>) <span class="op">*</span> (<span class="kw-2">*</span><span class="ident">H_SCALAR</span>).<span class="ident">pow</span>(<span class="kw-2">&amp;</span>[<span class="ident">w</span> <span class="kw">as</span> <span class="ident">u64</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>]));
+
+        <span class="self">self</span>.<span class="ident">process_window</span>::<span class="op">&lt;</span><span class="kw">_</span>, <span class="ident">NUM_WINDOWS</span><span class="op">&gt;</span>(<span class="ident">region</span>, <span class="ident">offset</span>, <span class="ident">w</span>, <span class="ident">k_usize</span>, <span class="ident">scalar</span>, <span class="ident">base</span>)
+    }
+
+    <span class="doccomment">/// Assigns the values used to process the window containing the MSB.</span>
     <span class="kw">fn</span> <span class="ident">process_msb</span><span class="op">&lt;</span><span class="ident">F</span>: <span class="ident">FixedPoint</span><span class="op">&lt;</span><span class="ident">pallas::Affine</span><span class="op">&gt;</span>, <span class="kw">const</span> <span class="ident">NUM_WINDOWS</span>: <span class="ident">usize</span><span class="op">&gt;</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">region</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Region</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">pallas::Base</span><span class="op">&gt;</span>,
@@ -896,59 +904,25 @@
         <span class="ident">base</span>: <span class="kw-2">&amp;</span><span class="ident">F</span>,
         <span class="ident">scalar</span>: <span class="kw-2">&amp;</span><span class="ident">ScalarFixed</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">NonIdentityEccPoint</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="comment">// Assign u = (y_p + z_w).sqrt() for the most significant window</span>
-        {
-            <span class="kw">let</span> <span class="ident">u_val</span> <span class="op">=</span> <span class="ident">scalar</span>.<span class="ident">windows_usize</span>()[<span class="ident">NUM_WINDOWS</span> <span class="op">-</span> <span class="number">1</span>]
-                .<span class="ident">map</span>(<span class="op">|</span><span class="ident">k</span><span class="op">|</span> <span class="ident">pallas::Base::from_repr</span>(<span class="ident">base</span>.<span class="ident">u</span>()[<span class="ident">NUM_WINDOWS</span> <span class="op">-</span> <span class="number">1</span>][<span class="ident">k</span>]).<span class="ident">unwrap</span>());
-            <span class="ident">region</span>.<span class="ident">assign_advice</span>(
-                <span class="op">|</span><span class="op">|</span> <span class="string">&quot;u&quot;</span>,
-                <span class="self">self</span>.<span class="ident">u</span>,
-                <span class="ident">offset</span> <span class="op">+</span> <span class="ident">NUM_WINDOWS</span> <span class="op">-</span> <span class="number">1</span>,
-                <span class="op">|</span><span class="op">|</span> <span class="ident">u_val</span>.<span class="ident">ok_or</span>(<span class="ident">Error::Synthesis</span>),
-            )<span class="question-mark">?</span>;
-        }
+        <span class="kw">let</span> <span class="ident">k_usize</span> <span class="op">=</span> <span class="ident">scalar</span>.<span class="ident">windows_usize</span>()[<span class="ident">NUM_WINDOWS</span> <span class="op">-</span> <span class="number">1</span>];
 
         <span class="comment">// offset_acc = \sum_{j = 0}^{NUM_WINDOWS - 2} 2^{FIXED_BASE_WINDOW_SIZE*j + 1}</span>
         <span class="kw">let</span> <span class="ident">offset_acc</span> <span class="op">=</span> (<span class="number">0</span>..(<span class="ident">NUM_WINDOWS</span> <span class="op">-</span> <span class="number">1</span>)).<span class="ident">fold</span>(<span class="ident">pallas::Scalar::zero</span>(), <span class="op">|</span><span class="ident">acc</span>, <span class="ident">w</span><span class="op">|</span> {
             <span class="ident">acc</span> <span class="op">+</span> (<span class="kw-2">*</span><span class="ident">TWO_SCALAR</span>).<span class="ident">pow</span>(<span class="kw-2">&amp;</span>[<span class="ident">FIXED_BASE_WINDOW_SIZE</span> <span class="kw">as</span> <span class="ident">u64</span> <span class="op">*</span> <span class="ident">w</span> <span class="kw">as</span> <span class="ident">u64</span> <span class="op">+</span> <span class="number">1</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>])
         });
 
-        <span class="comment">// `scalar = [k * 8^84 - offset_acc]`, where `offset_acc = \sum_{j = 0}^{83} 2^{FIXED_BASE_WINDOW_SIZE*j + 1}`.</span>
+        <span class="comment">// `scalar = [k * 8^(NUM_WINDOWS - 1) - offset_acc]`.</span>
         <span class="kw">let</span> <span class="ident">scalar</span> <span class="op">=</span> <span class="ident">scalar</span>.<span class="ident">windows_field</span>()[<span class="ident">scalar</span>.<span class="ident">windows_field</span>().<span class="ident">len</span>() <span class="op">-</span> <span class="number">1</span>]
             .<span class="ident">map</span>(<span class="op">|</span><span class="ident">k</span><span class="op">|</span> <span class="ident">k</span> <span class="op">*</span> (<span class="kw-2">*</span><span class="ident">H_SCALAR</span>).<span class="ident">pow</span>(<span class="kw-2">&amp;</span>[(<span class="ident">NUM_WINDOWS</span> <span class="op">-</span> <span class="number">1</span>) <span class="kw">as</span> <span class="ident">u64</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>]) <span class="op">-</span> <span class="ident">offset_acc</span>);
 
-        <span class="kw">let</span> <span class="ident">mul_b</span> <span class="op">=</span> {
-            <span class="kw">let</span> <span class="ident">mul_b</span> <span class="op">=</span> <span class="ident">scalar</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">scalar</span><span class="op">|</span> <span class="ident">base</span>.<span class="ident">generator</span>() <span class="op">*</span> <span class="ident">scalar</span>);
-            <span class="kw">let</span> <span class="ident">mul_b</span> <span class="op">=</span> <span class="ident">mul_b</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">mul_b</span><span class="op">|</span> <span class="ident">mul_b</span>.<span class="ident">to_affine</span>().<span class="ident">coordinates</span>().<span class="ident">unwrap</span>());
-
-            <span class="kw">let</span> <span class="ident">x</span> <span class="op">=</span> <span class="ident">mul_b</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">mul_b</span><span class="op">|</span> {
-                <span class="kw">let</span> <span class="ident">x</span> <span class="op">=</span> <span class="kw-2">*</span><span class="ident">mul_b</span>.<span class="ident">x</span>();
-                <span class="macro">assert!</span>(<span class="ident">x</span> <span class="op">!</span><span class="op">=</span> <span class="ident">pallas::Base::zero</span>());
-                <span class="ident">x</span>
-            });
-            <span class="kw">let</span> <span class="ident">x</span> <span class="op">=</span> <span class="ident">region</span>.<span class="ident">assign_advice</span>(
-                <span class="op">|</span><span class="op">|</span> <span class="macro">format!</span>(<span class="string">&quot;mul_b_x, window {}&quot;</span>, <span class="ident">NUM_WINDOWS</span> <span class="op">-</span> <span class="number">1</span>),
-                <span class="self">self</span>.<span class="ident">x_p</span>,
-                <span class="ident">offset</span> <span class="op">+</span> <span class="ident">NUM_WINDOWS</span> <span class="op">-</span> <span class="number">1</span>,
-                <span class="op">|</span><span class="op">|</span> <span class="ident">x</span>.<span class="ident">ok_or</span>(<span class="ident">Error::Synthesis</span>),
-            )<span class="question-mark">?</span>;
-
-            <span class="kw">let</span> <span class="ident">y</span> <span class="op">=</span> <span class="ident">mul_b</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">mul_b</span><span class="op">|</span> {
-                <span class="kw">let</span> <span class="ident">y</span> <span class="op">=</span> <span class="kw-2">*</span><span class="ident">mul_b</span>.<span class="ident">y</span>();
-                <span class="macro">assert!</span>(<span class="ident">y</span> <span class="op">!</span><span class="op">=</span> <span class="ident">pallas::Base::zero</span>());
-                <span class="ident">y</span>
-            });
-            <span class="kw">let</span> <span class="ident">y</span> <span class="op">=</span> <span class="ident">region</span>.<span class="ident">assign_advice</span>(
-                <span class="op">|</span><span class="op">|</span> <span class="macro">format!</span>(<span class="string">&quot;mul_b_y, window {}&quot;</span>, <span class="ident">NUM_WINDOWS</span> <span class="op">-</span> <span class="number">1</span>),
-                <span class="self">self</span>.<span class="ident">y_p</span>,
-                <span class="ident">offset</span> <span class="op">+</span> <span class="ident">NUM_WINDOWS</span> <span class="op">-</span> <span class="number">1</span>,
-                <span class="op">|</span><span class="op">|</span> <span class="ident">y</span>.<span class="ident">ok_or</span>(<span class="ident">Error::Synthesis</span>),
-            )<span class="question-mark">?</span>;
-
-            <span class="ident">NonIdentityEccPoint</span> { <span class="ident">x</span>, <span class="ident">y</span> }
-        };
-
-        <span class="prelude-val">Ok</span>(<span class="ident">mul_b</span>)
+        <span class="self">self</span>.<span class="ident">process_window</span>::<span class="op">&lt;</span><span class="kw">_</span>, <span class="ident">NUM_WINDOWS</span><span class="op">&gt;</span>(
+            <span class="ident">region</span>,
+            <span class="ident">offset</span>,
+            <span class="ident">NUM_WINDOWS</span> <span class="op">-</span> <span class="number">1</span>,
+            <span class="ident">k_usize</span>,
+            <span class="ident">scalar</span>,
+            <span class="ident">base</span>,
+        )
     }
 }
 
@@ -977,28 +951,43 @@
 }
 
 <span class="kw">impl</span> <span class="ident">ScalarFixed</span> {
-    <span class="comment">// The scalar decomposition was done in the base field. For computation</span>
-    <span class="comment">// outside the circuit, we now convert them back into the scalar field.</span>
-    <span class="kw">fn</span> <span class="ident">windows_field</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">pallas::Scalar</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="doccomment">/// The scalar decomposition was done in the base field. For computation</span>
+    <span class="doccomment">/// outside the circuit, we now convert them back into the scalar field.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// This function does not require that the base field fits inside the scalar field,</span>
+    <span class="doccomment">/// because the window size fits into either field.</span>
+    <span class="kw">fn</span> <span class="ident">windows_field</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Value</span><span class="op">&lt;</span><span class="ident">pallas::Scalar</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">running_sum_to_windows</span> <span class="op">=</span> <span class="op">|</span><span class="ident">zs</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">AssignedCell</span><span class="op">&lt;</span><span class="ident">pallas::Base</span>, <span class="ident">pallas::Base</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">|</span> {
             (<span class="number">0</span>..(<span class="ident">zs</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="number">1</span>))
                 .<span class="ident">map</span>(<span class="op">|</span><span class="ident">idx</span><span class="op">|</span> {
                     <span class="kw">let</span> <span class="ident">z_cur</span> <span class="op">=</span> <span class="ident">zs</span>[<span class="ident">idx</span>].<span class="ident">value</span>();
                     <span class="kw">let</span> <span class="ident">z_next</span> <span class="op">=</span> <span class="ident">zs</span>[<span class="ident">idx</span> <span class="op">+</span> <span class="number">1</span>].<span class="ident">value</span>();
-                    <span class="kw">let</span> <span class="ident">word</span> <span class="op">=</span> <span class="ident">z_cur</span>
-                        .<span class="ident">zip</span>(<span class="ident">z_next</span>)
-                        .<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">z_cur</span>, <span class="ident">z_next</span>)<span class="op">|</span> <span class="ident">z_cur</span> <span class="op">-</span> <span class="ident">z_next</span> <span class="op">*</span> <span class="kw-2">*</span><span class="ident">H_BASE</span>);
+                    <span class="kw">let</span> <span class="ident">word</span> <span class="op">=</span> <span class="ident">z_cur</span> <span class="op">-</span> <span class="ident">z_next</span> <span class="op">*</span> <span class="ident">Value::known</span>(<span class="kw-2">*</span><span class="ident">H_BASE</span>);
+                    <span class="comment">// This assumes that the endianness of the encodings of pallas::Base</span>
+                    <span class="comment">// and pallas::Scalar are the same. They happen to be, but we need to</span>
+                    <span class="comment">// be careful if this is generalised.</span>
                     <span class="ident">word</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">word</span><span class="op">|</span> <span class="ident">pallas::Scalar::from_repr</span>(<span class="ident">word</span>.<span class="ident">to_repr</span>()).<span class="ident">unwrap</span>())
                 })
                 .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>()
         };
         <span class="kw">match</span> <span class="self">self</span> {
             <span class="ident"><span class="self">Self</span>::BaseFieldElem</span>(<span class="ident">scalar</span>) =&gt; <span class="ident">running_sum_to_windows</span>(<span class="ident">scalar</span>.<span class="ident">running_sum</span>.<span class="ident">to_vec</span>()),
-            <span class="ident"><span class="self">Self</span>::Short</span>(<span class="ident">scalar</span>) =&gt; <span class="ident">running_sum_to_windows</span>(<span class="ident">scalar</span>.<span class="ident">running_sum</span>.<span class="ident">to_vec</span>()),
+            <span class="ident"><span class="self">Self</span>::Short</span>(<span class="ident">scalar</span>) =&gt; <span class="ident">running_sum_to_windows</span>(
+                <span class="ident">scalar</span>
+                    .<span class="ident">running_sum</span>
+                    .<span class="ident">as_ref</span>()
+                    .<span class="ident">expect</span>(<span class="string">&quot;EccScalarFixedShort has been constrained&quot;</span>)
+                    .<span class="ident">to_vec</span>(),
+            ),
             <span class="ident"><span class="self">Self</span>::FullWidth</span>(<span class="ident">scalar</span>) =&gt; <span class="ident">scalar</span>
                 .<span class="ident">windows</span>
+                .<span class="ident">as_ref</span>()
+                .<span class="ident">expect</span>(<span class="string">&quot;EccScalarFixed has been witnessed&quot;</span>)
                 .<span class="ident">iter</span>()
                 .<span class="ident">map</span>(<span class="op">|</span><span class="ident">bits</span><span class="op">|</span> {
+                    <span class="comment">// This assumes that the endianness of the encodings of pallas::Base</span>
+                    <span class="comment">// and pallas::Scalar are the same. They happen to be, but we need to</span>
+                    <span class="comment">// be careful if this is generalised.</span>
                     <span class="ident">bits</span>.<span class="ident">value</span>()
                         .<span class="ident">map</span>(<span class="op">|</span><span class="ident">value</span><span class="op">|</span> <span class="ident">pallas::Scalar::from_repr</span>(<span class="ident">value</span>.<span class="ident">to_repr</span>()).<span class="ident">unwrap</span>())
                 })
@@ -1006,26 +995,25 @@
         }
     }
 
-    <span class="comment">// The scalar decomposition is guaranteed to be in three-bit windows,</span>
-    <span class="comment">// so we also cast the least significant 4 bytes in their serialisation</span>
-    <span class="comment">// into usize for convenient indexing into `u`-values</span>
-    <span class="kw">fn</span> <span class="ident">windows_usize</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="doccomment">/// The scalar decomposition is guaranteed to be in three-bit windows, so we construct</span>
+    <span class="doccomment">/// `usize` indices from the lowest three bits of each window field element for</span>
+    <span class="doccomment">/// convenient indexing into `u`-values.</span>
+    <span class="kw">fn</span> <span class="ident">windows_usize</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Value</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">windows_field</span>()
             .<span class="ident">iter</span>()
             .<span class="ident">map</span>(<span class="op">|</span><span class="ident">window</span><span class="op">|</span> {
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">window</span>) <span class="op">=</span> <span class="ident">window</span> {
-                    <span class="comment">// TODO: Remove this trait dependency</span>
-                    <span class="kw">use</span> <span class="ident">pasta_curves::arithmetic::SqrtRatio</span>;
-                    <span class="kw">let</span> <span class="ident">window</span> <span class="op">=</span> <span class="ident">window</span>.<span class="ident">get_lower_32</span>() <span class="kw">as</span> <span class="ident">usize</span>;
-                    <span class="macro">assert!</span>(<span class="ident">window</span> <span class="op">&lt;</span> <span class="ident">H</span>);
-                    <span class="prelude-val">Some</span>(<span class="ident">window</span>)
-                } <span class="kw">else</span> {
-                    <span class="prelude-val">None</span>
-                }
+                <span class="ident">window</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">window</span><span class="op">|</span> {
+                    <span class="ident">window</span>
+                        .<span class="ident">to_le_bits</span>()
+                        .<span class="ident">iter</span>()
+                        .<span class="ident">by_vals</span>()
+                        .<span class="ident">take</span>(<span class="ident">FIXED_BASE_WINDOW_SIZE</span>)
+                        .<span class="ident">rev</span>()
+                        .<span class="ident">fold</span>(<span class="number">0</span>, <span class="op">|</span><span class="ident">acc</span>, <span class="ident">b</span><span class="op">|</span> <span class="number">2</span> <span class="op">*</span> <span class="ident">acc</span> <span class="op">+</span> <span class="kw">if</span> <span class="ident">b</span> { <span class="number">1</span> } <span class="kw">else</span> { <span class="number">0</span> })
+                })
             })
             .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>()
     }
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="halo2_gadgets" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.60.0-nightly (ee5d8d37b 2022-01-17)" ></div>
-</body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="halo2_gadgets" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (20ffea693 2022-08-11)" ></div></body></html>

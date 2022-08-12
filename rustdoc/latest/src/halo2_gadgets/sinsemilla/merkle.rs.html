@@ -1,5 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `halo2_gadgets/src/sinsemilla/merkle.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>merkle.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><script defer src="../../../main.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script>
-    <noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/katex.min.css" integrity="sha384-9eLZqc9ds8eNjO3TmqPeYcDj8n+Qfa4nuSiGYa6DjLNcv9BtN69ZIulL9+8CqC9Y" crossorigin="anonymous">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `halo2_gadgets/src/sinsemilla/merkle.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>merkle.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/katex.min.css" integrity="sha384-9eLZqc9ds8eNjO3TmqPeYcDj8n+Qfa4nuSiGYa6DjLNcv9BtN69ZIulL9+8CqC9Y" crossorigin="anonymous">
 <script src="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/katex.min.js"                  integrity="sha384-K3vbOmF2BtaVai+Qk37uypf7VrgBubhQreNQe9aGsz9lB63dIFiQVlJbr92dw2Lx" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/contrib/auto-render.min.js"    integrity="sha384-kmZOZB5ObwgQnS/DuDg6TScgOiWWBiVt0plIRkZCmE6rDZGrEOQeHM5PcHi+nyqe" crossorigin="anonymous"></script>
 <script>
@@ -14,107 +13,105 @@
         });
     });
 </script>
-</head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a class="sidebar-logo" href="../../../halo2_gadgets/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div>
-        </a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../halo2_gadgets/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><form class="search-form"><div class="search-container"><div>
-                                <input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../../wheel.svg"></a></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
-<span id="2">  2</span>
-<span id="3">  3</span>
-<span id="4">  4</span>
-<span id="5">  5</span>
-<span id="6">  6</span>
-<span id="7">  7</span>
-<span id="8">  8</span>
-<span id="9">  9</span>
-<span id="10"> 10</span>
-<span id="11"> 11</span>
-<span id="12"> 12</span>
-<span id="13"> 13</span>
-<span id="14"> 14</span>
-<span id="15"> 15</span>
-<span id="16"> 16</span>
-<span id="17"> 17</span>
-<span id="18"> 18</span>
-<span id="19"> 19</span>
-<span id="20"> 20</span>
-<span id="21"> 21</span>
-<span id="22"> 22</span>
-<span id="23"> 23</span>
-<span id="24"> 24</span>
-<span id="25"> 25</span>
-<span id="26"> 26</span>
-<span id="27"> 27</span>
-<span id="28"> 28</span>
-<span id="29"> 29</span>
-<span id="30"> 30</span>
-<span id="31"> 31</span>
-<span id="32"> 32</span>
-<span id="33"> 33</span>
-<span id="34"> 34</span>
-<span id="35"> 35</span>
-<span id="36"> 36</span>
-<span id="37"> 37</span>
-<span id="38"> 38</span>
-<span id="39"> 39</span>
-<span id="40"> 40</span>
-<span id="41"> 41</span>
-<span id="42"> 42</span>
-<span id="43"> 43</span>
-<span id="44"> 44</span>
-<span id="45"> 45</span>
-<span id="46"> 46</span>
-<span id="47"> 47</span>
-<span id="48"> 48</span>
-<span id="49"> 49</span>
-<span id="50"> 50</span>
-<span id="51"> 51</span>
-<span id="52"> 52</span>
-<span id="53"> 53</span>
-<span id="54"> 54</span>
-<span id="55"> 55</span>
-<span id="56"> 56</span>
-<span id="57"> 57</span>
-<span id="58"> 58</span>
-<span id="59"> 59</span>
-<span id="60"> 60</span>
-<span id="61"> 61</span>
-<span id="62"> 62</span>
-<span id="63"> 63</span>
-<span id="64"> 64</span>
-<span id="65"> 65</span>
-<span id="66"> 66</span>
-<span id="67"> 67</span>
-<span id="68"> 68</span>
-<span id="69"> 69</span>
-<span id="70"> 70</span>
-<span id="71"> 71</span>
-<span id="72"> 72</span>
-<span id="73"> 73</span>
-<span id="74"> 74</span>
-<span id="75"> 75</span>
-<span id="76"> 76</span>
-<span id="77"> 77</span>
-<span id="78"> 78</span>
-<span id="79"> 79</span>
-<span id="80"> 80</span>
-<span id="81"> 81</span>
-<span id="82"> 82</span>
-<span id="83"> 83</span>
-<span id="84"> 84</span>
-<span id="85"> 85</span>
-<span id="86"> 86</span>
-<span id="87"> 87</span>
-<span id="88"> 88</span>
-<span id="89"> 89</span>
-<span id="90"> 90</span>
-<span id="91"> 91</span>
-<span id="92"> 92</span>
-<span id="93"> 93</span>
-<span id="94"> 94</span>
-<span id="95"> 95</span>
-<span id="96"> 96</span>
-<span id="97"> 97</span>
-<span id="98"> 98</span>
-<span id="99"> 99</span>
+</head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../halo2_gadgets/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../halo2_gadgets/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../halo2_gadgets/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<span id="2">2</span>
+<span id="3">3</span>
+<span id="4">4</span>
+<span id="5">5</span>
+<span id="6">6</span>
+<span id="7">7</span>
+<span id="8">8</span>
+<span id="9">9</span>
+<span id="10">10</span>
+<span id="11">11</span>
+<span id="12">12</span>
+<span id="13">13</span>
+<span id="14">14</span>
+<span id="15">15</span>
+<span id="16">16</span>
+<span id="17">17</span>
+<span id="18">18</span>
+<span id="19">19</span>
+<span id="20">20</span>
+<span id="21">21</span>
+<span id="22">22</span>
+<span id="23">23</span>
+<span id="24">24</span>
+<span id="25">25</span>
+<span id="26">26</span>
+<span id="27">27</span>
+<span id="28">28</span>
+<span id="29">29</span>
+<span id="30">30</span>
+<span id="31">31</span>
+<span id="32">32</span>
+<span id="33">33</span>
+<span id="34">34</span>
+<span id="35">35</span>
+<span id="36">36</span>
+<span id="37">37</span>
+<span id="38">38</span>
+<span id="39">39</span>
+<span id="40">40</span>
+<span id="41">41</span>
+<span id="42">42</span>
+<span id="43">43</span>
+<span id="44">44</span>
+<span id="45">45</span>
+<span id="46">46</span>
+<span id="47">47</span>
+<span id="48">48</span>
+<span id="49">49</span>
+<span id="50">50</span>
+<span id="51">51</span>
+<span id="52">52</span>
+<span id="53">53</span>
+<span id="54">54</span>
+<span id="55">55</span>
+<span id="56">56</span>
+<span id="57">57</span>
+<span id="58">58</span>
+<span id="59">59</span>
+<span id="60">60</span>
+<span id="61">61</span>
+<span id="62">62</span>
+<span id="63">63</span>
+<span id="64">64</span>
+<span id="65">65</span>
+<span id="66">66</span>
+<span id="67">67</span>
+<span id="68">68</span>
+<span id="69">69</span>
+<span id="70">70</span>
+<span id="71">71</span>
+<span id="72">72</span>
+<span id="73">73</span>
+<span id="74">74</span>
+<span id="75">75</span>
+<span id="76">76</span>
+<span id="77">77</span>
+<span id="78">78</span>
+<span id="79">79</span>
+<span id="80">80</span>
+<span id="81">81</span>
+<span id="82">82</span>
+<span id="83">83</span>
+<span id="84">84</span>
+<span id="85">85</span>
+<span id="86">86</span>
+<span id="87">87</span>
+<span id="88">88</span>
+<span id="89">89</span>
+<span id="90">90</span>
+<span id="91">91</span>
+<span id="92">92</span>
+<span id="93">93</span>
+<span id="94">94</span>
+<span id="95">95</span>
+<span id="96">96</span>
+<span id="97">97</span>
+<span id="98">98</span>
+<span id="99">99</span>
 <span id="100">100</span>
 <span id="101">101</span>
 <span id="102">102</span>
@@ -400,20 +397,31 @@
 <span id="382">382</span>
 <span id="383">383</span>
 <span id="384">384</span>
+<span id="385">385</span>
+<span id="386">386</span>
+<span id="387">387</span>
+<span id="388">388</span>
+<span id="389">389</span>
+<span id="390">390</span>
+<span id="391">391</span>
+<span id="392">392</span>
+<span id="393">393</span>
+<span id="394">394</span>
+<span id="395">395</span>
+<span id="396">396</span>
+<span id="397">397</span>
+<span id="398">398</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Gadgets for implementing a Merkle tree with Sinsemilla.</span>
 
 <span class="kw">use</span> <span class="ident">halo2_proofs</span>::{
-    <span class="ident">circuit</span>::{<span class="ident">Chip</span>, <span class="ident">Layouter</span>},
+    <span class="ident">circuit</span>::{<span class="ident">Chip</span>, <span class="ident">Layouter</span>, <span class="ident">Value</span>},
     <span class="ident">plonk::Error</span>,
 };
 <span class="kw">use</span> <span class="ident">pasta_curves::arithmetic::CurveAffine</span>;
 
 <span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">HashDomains</span>, <span class="ident">SinsemillaInstructions</span>};
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::utilities</span>::{
-    <span class="ident">cond_swap::CondSwapInstructions</span>, <span class="ident">i2lebsp</span>, <span class="ident">transpose_option_array</span>, <span class="ident">UtilitiesInstructions</span>,
-};
-<span class="kw">use</span> <span class="ident">std::iter</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::utilities</span>::{<span class="ident">cond_swap::CondSwapInstructions</span>, <span class="ident">i2lebsp</span>, <span class="ident">UtilitiesInstructions</span>};
 
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">chip</span>;
 
@@ -457,15 +465,15 @@
     <span class="kw">const</span> <span class="ident">PATH_LENGTH</span>: <span class="ident">usize</span>,
     <span class="kw">const</span> <span class="ident">K</span>: <span class="ident">usize</span>,
     <span class="kw">const</span> <span class="ident">MAX_WORDS</span>: <span class="ident">usize</span>,
+    <span class="kw">const</span> <span class="ident">PAR</span>: <span class="ident">usize</span>,
 <span class="op">&gt;</span> <span class="kw">where</span>
     <span class="ident">MerkleChip</span>: <span class="ident">MerkleInstructions</span><span class="op">&lt;</span><span class="ident">C</span>, <span class="ident">PATH_LENGTH</span>, <span class="ident">K</span>, <span class="ident">MAX_WORDS</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Clone</span>,
 {
-    <span class="ident">chip_1</span>: <span class="ident">MerkleChip</span>,
-    <span class="ident">chip_2</span>: <span class="ident">MerkleChip</span>,
+    <span class="ident">chips</span>: [<span class="ident">MerkleChip</span>; <span class="ident">PAR</span>],
     <span class="ident">domain</span>: <span class="ident">MerkleChip::HashDomains</span>,
-    <span class="ident">leaf_pos</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="ident">leaf_pos</span>: <span class="ident">Value</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
     <span class="comment">// The Merkle path is ordered from leaves to root.</span>
-    <span class="ident">path</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span>[<span class="ident">C::Base</span>; <span class="ident">PATH_LENGTH</span>]<span class="op">&gt;</span>,
+    <span class="ident">path</span>: <span class="ident">Value</span><span class="op">&lt;</span>[<span class="ident">C::Base</span>; <span class="ident">PATH_LENGTH</span>]<span class="op">&gt;</span>,
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span>
@@ -474,21 +482,27 @@
         <span class="kw">const</span> <span class="ident">PATH_LENGTH</span>: <span class="ident">usize</span>,
         <span class="kw">const</span> <span class="ident">K</span>: <span class="ident">usize</span>,
         <span class="kw">const</span> <span class="ident">MAX_WORDS</span>: <span class="ident">usize</span>,
-    <span class="op">&gt;</span> <span class="ident">MerklePath</span><span class="op">&lt;</span><span class="ident">C</span>, <span class="ident">MerkleChip</span>, <span class="ident">PATH_LENGTH</span>, <span class="ident">K</span>, <span class="ident">MAX_WORDS</span><span class="op">&gt;</span>
+        <span class="kw">const</span> <span class="ident">PAR</span>: <span class="ident">usize</span>,
+    <span class="op">&gt;</span> <span class="ident">MerklePath</span><span class="op">&lt;</span><span class="ident">C</span>, <span class="ident">MerkleChip</span>, <span class="ident">PATH_LENGTH</span>, <span class="ident">K</span>, <span class="ident">MAX_WORDS</span>, <span class="ident">PAR</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">MerkleChip</span>: <span class="ident">MerkleInstructions</span><span class="op">&lt;</span><span class="ident">C</span>, <span class="ident">PATH_LENGTH</span>, <span class="ident">K</span>, <span class="ident">MAX_WORDS</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Clone</span>,
 {
     <span class="doccomment">/// Constructs a [`MerklePath`].</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// A circuit may have many more columns available than are required by a single</span>
+    <span class="doccomment">/// `MerkleChip`. To make better use of the available circuit area, the `MerklePath`</span>
+    <span class="doccomment">/// gadget will distribute its path hashing across each `MerkleChip` in `chips`, such</span>
+    <span class="doccomment">/// that each chip processes `ceil(PATH_LENGTH / PAR)` layers (with the last chip</span>
+    <span class="doccomment">/// processing fewer layers if the division is inexact).</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">construct</span>(
-        <span class="ident">chip_1</span>: <span class="ident">MerkleChip</span>,
-        <span class="ident">chip_2</span>: <span class="ident">MerkleChip</span>,
+        <span class="ident">chips</span>: [<span class="ident">MerkleChip</span>; <span class="ident">PAR</span>],
         <span class="ident">domain</span>: <span class="ident">MerkleChip::HashDomains</span>,
-        <span class="ident">leaf_pos</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
-        <span class="ident">path</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span>[<span class="ident">C::Base</span>; <span class="ident">PATH_LENGTH</span>]<span class="op">&gt;</span>,
+        <span class="ident">leaf_pos</span>: <span class="ident">Value</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+        <span class="ident">path</span>: <span class="ident">Value</span><span class="op">&lt;</span>[<span class="ident">C::Base</span>; <span class="ident">PATH_LENGTH</span>]<span class="op">&gt;</span>,
     ) -&gt; <span class="self">Self</span> {
+        <span class="macro">assert_ne!</span>(<span class="ident">PAR</span>, <span class="number">0</span>);
         <span class="self">Self</span> {
-            <span class="ident">chip_1</span>,
-            <span class="ident">chip_2</span>,
+            <span class="ident">chips</span>,
             <span class="ident">domain</span>,
             <span class="ident">leaf_pos</span>,
             <span class="ident">path</span>,
@@ -503,31 +517,35 @@
         <span class="kw">const</span> <span class="ident">PATH_LENGTH</span>: <span class="ident">usize</span>,
         <span class="kw">const</span> <span class="ident">K</span>: <span class="ident">usize</span>,
         <span class="kw">const</span> <span class="ident">MAX_WORDS</span>: <span class="ident">usize</span>,
-    <span class="op">&gt;</span> <span class="ident">MerklePath</span><span class="op">&lt;</span><span class="ident">C</span>, <span class="ident">MerkleChip</span>, <span class="ident">PATH_LENGTH</span>, <span class="ident">K</span>, <span class="ident">MAX_WORDS</span><span class="op">&gt;</span>
+        <span class="kw">const</span> <span class="ident">PAR</span>: <span class="ident">usize</span>,
+    <span class="op">&gt;</span> <span class="ident">MerklePath</span><span class="op">&lt;</span><span class="ident">C</span>, <span class="ident">MerkleChip</span>, <span class="ident">PATH_LENGTH</span>, <span class="ident">K</span>, <span class="ident">MAX_WORDS</span>, <span class="ident">PAR</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">MerkleChip</span>: <span class="ident">MerkleInstructions</span><span class="op">&lt;</span><span class="ident">C</span>, <span class="ident">PATH_LENGTH</span>, <span class="ident">K</span>, <span class="ident">MAX_WORDS</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Clone</span>,
 {
     <span class="doccomment">/// Calculates the root of the tree containing the given leaf at this Merkle path.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Implements [Zcash Protocol Specification Section 4.9: Merkle Path Validity][merklepath].</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// [merklepath]: https://zips.z.cash/protocol/protocol.pdf#merklepath</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">calculate_root</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="kw-2">mut</span> <span class="ident">layouter</span>: <span class="kw">impl</span> <span class="ident">Layouter</span><span class="op">&lt;</span><span class="ident">C::Base</span><span class="op">&gt;</span>,
         <span class="ident">leaf</span>: <span class="ident">MerkleChip::Var</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">MerkleChip::Var</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="comment">// A Sinsemilla chip uses 5 advice columns, but the full Orchard action circuit</span>
-        <span class="comment">// uses 10 advice columns. We distribute the path hashing across two Sinsemilla</span>
-        <span class="comment">// chips to make better use of the available circuit area.</span>
-        <span class="kw">let</span> <span class="ident">chips</span> <span class="op">=</span> <span class="ident">iter::empty</span>()
-            .<span class="ident">chain</span>(<span class="ident">iter::repeat</span>(<span class="self">self</span>.<span class="ident">chip_1</span>.<span class="ident">clone</span>()).<span class="ident">take</span>(<span class="ident">PATH_LENGTH</span> <span class="op">/</span> <span class="number">2</span>))
-            .<span class="ident">chain</span>(<span class="ident">iter::repeat</span>(<span class="self">self</span>.<span class="ident">chip_2</span>.<span class="ident">clone</span>()));
+        <span class="comment">// Each chip processes `ceil(PATH_LENGTH / PAR)` layers.</span>
+        <span class="kw">let</span> <span class="ident">layers_per_chip</span> <span class="op">=</span> (<span class="ident">PATH_LENGTH</span> <span class="op">+</span> <span class="ident">PAR</span> <span class="op">-</span> <span class="number">1</span>) <span class="op">/</span> <span class="ident">PAR</span>;
+
+        <span class="comment">// Assign each layer to a chip.</span>
+        <span class="kw">let</span> <span class="ident">chips</span> <span class="op">=</span> (<span class="number">0</span>..<span class="ident">PATH_LENGTH</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">i</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">chips</span>[<span class="ident">i</span> <span class="op">/</span> <span class="ident">layers_per_chip</span>].<span class="ident">clone</span>());
 
         <span class="comment">// The Merkle path is ordered from leaves to root, which is consistent with the</span>
         <span class="comment">// little-endian representation of `pos` below.</span>
-        <span class="kw">let</span> <span class="ident">path</span> <span class="op">=</span> <span class="ident">transpose_option_array</span>(<span class="self">self</span>.<span class="ident">path</span>);
+        <span class="kw">let</span> <span class="ident">path</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">path</span>.<span class="ident">transpose_array</span>();
 
         <span class="comment">// Get position as a PATH_LENGTH-bit bitstring (little-endian bit order).</span>
-        <span class="kw">let</span> <span class="ident">pos</span>: [<span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>; <span class="ident">PATH_LENGTH</span>] <span class="op">=</span> {
-            <span class="kw">let</span> <span class="ident">pos</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span>[<span class="ident">bool</span>; <span class="ident">PATH_LENGTH</span>]<span class="op">&gt;</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">leaf_pos</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">pos</span><span class="op">|</span> <span class="ident">i2lebsp</span>(<span class="ident">pos</span> <span class="kw">as</span> <span class="ident">u64</span>));
-            <span class="ident">transpose_option_array</span>(<span class="ident">pos</span>)
+        <span class="kw">let</span> <span class="ident">pos</span>: [<span class="ident">Value</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>; <span class="ident">PATH_LENGTH</span>] <span class="op">=</span> {
+            <span class="kw">let</span> <span class="ident">pos</span>: <span class="ident">Value</span><span class="op">&lt;</span>[<span class="ident">bool</span>; <span class="ident">PATH_LENGTH</span>]<span class="op">&gt;</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">leaf_pos</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">pos</span><span class="op">|</span> <span class="ident">i2lebsp</span>(<span class="ident">pos</span> <span class="kw">as</span> <span class="ident">u64</span>));
+            <span class="ident">pos</span>.<span class="ident">transpose_array</span>()
         };
 
         <span class="kw">let</span> <span class="ident">Q</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">domain</span>.<span class="ident">Q</span>();
@@ -540,6 +558,9 @@
             <span class="comment">// we have `l` = 32 - 31 - 1 = 0.</span>
             <span class="comment">// On the other hand, when `layer = 0` (the final sibling on the Merkle path),</span>
             <span class="comment">// we have `l` = 32 - 0 - 1 = 31.</span>
+
+            <span class="comment">// Constrain which of (node, sibling) is (left, right) with a conditional swap</span>
+            <span class="comment">// tied to the current bit of the position.</span>
             <span class="kw">let</span> <span class="ident">pair</span> <span class="op">=</span> {
                 <span class="kw">let</span> <span class="ident">pair</span> <span class="op">=</span> (<span class="ident">node</span>, <span class="kw-2">*</span><span class="ident">sibling</span>);
 
@@ -547,11 +568,10 @@
                 <span class="ident">chip</span>.<span class="ident">swap</span>(<span class="ident">layouter</span>.<span class="ident">namespace</span>(<span class="op">|</span><span class="op">|</span> <span class="string">&quot;node position&quot;</span>), <span class="ident">pair</span>, <span class="kw-2">*</span><span class="ident">pos</span>)<span class="question-mark">?</span>
             };
 
-            <span class="comment">// Each `hash_layer` consists of 52 Sinsemilla words:</span>
-            <span class="comment">//  - l (10 bits) = 1 word</span>
-            <span class="comment">//  - left (255 bits) || right (255 bits) = 51 words (510 bits)</span>
+            <span class="comment">// Compute the node in layer l from its children:</span>
+            <span class="comment">//     M^l_i = MerkleCRH(l, M^{l+1}_{2i}, M^{l+1}_{2i+1})</span>
             <span class="ident">node</span> <span class="op">=</span> <span class="ident">chip</span>.<span class="ident">hash_layer</span>(
-                <span class="ident">layouter</span>.<span class="ident">namespace</span>(<span class="op">|</span><span class="op">|</span> <span class="macro">format!</span>(<span class="string">&quot;hash l {}&quot;</span>, <span class="ident">l</span>)),
+                <span class="ident">layouter</span>.<span class="ident">namespace</span>(<span class="op">|</span><span class="op">|</span> <span class="macro">format!</span>(<span class="string">&quot;MerkleCRH({}, left, right)&quot;</span>, <span class="ident">l</span>)),
                 <span class="ident">Q</span>,
                 <span class="ident">l</span>,
                 <span class="ident">pair</span>.<span class="number">0</span>,
@@ -582,7 +602,7 @@
 
     <span class="kw">use</span> <span class="ident">group::ff</span>::{<span class="ident">Field</span>, <span class="ident">PrimeField</span>, <span class="ident">PrimeFieldBits</span>};
     <span class="kw">use</span> <span class="ident">halo2_proofs</span>::{
-        <span class="ident">circuit</span>::{<span class="ident">Layouter</span>, <span class="ident">SimpleFloorPlanner</span>},
+        <span class="ident">circuit</span>::{<span class="ident">Layouter</span>, <span class="ident">SimpleFloorPlanner</span>, <span class="ident">Value</span>},
         <span class="ident">dev::MockProver</span>,
         <span class="ident">pasta::pallas</span>,
         <span class="ident">plonk</span>::{<span class="ident">Circuit</span>, <span class="ident">ConstraintSystem</span>, <span class="ident">Error</span>},
@@ -595,9 +615,9 @@
 
     <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Default</span>)]</span>
     <span class="kw">struct</span> <span class="ident">MyCircuit</span> {
-        <span class="ident">leaf</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">pallas::Base</span><span class="op">&gt;</span>,
-        <span class="ident">leaf_pos</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
-        <span class="ident">merkle_path</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span>[<span class="ident">pallas::Base</span>; <span class="ident">MERKLE_DEPTH</span>]<span class="op">&gt;</span>,
+        <span class="ident">leaf</span>: <span class="ident">Value</span><span class="op">&lt;</span><span class="ident">pallas::Base</span><span class="op">&gt;</span>,
+        <span class="ident">leaf_pos</span>: <span class="ident">Value</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+        <span class="ident">merkle_path</span>: <span class="ident">Value</span><span class="op">&lt;</span>[<span class="ident">pallas::Base</span>; <span class="ident">MERKLE_DEPTH</span>]<span class="op">&gt;</span>,
     }
 
     <span class="kw">impl</span> <span class="ident">Circuit</span><span class="op">&lt;</span><span class="ident">pallas::Base</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">MyCircuit</span> {
@@ -688,8 +708,7 @@
             )<span class="question-mark">?</span>;
 
             <span class="kw">let</span> <span class="ident">path</span> <span class="op">=</span> <span class="ident">MerklePath</span> {
-                <span class="ident">chip_1</span>,
-                <span class="ident">chip_2</span>,
+                <span class="ident">chips</span>: [<span class="ident">chip_1</span>, <span class="ident">chip_2</span>],
                 <span class="ident">domain</span>: <span class="ident">TestHashDomain</span>,
                 <span class="ident">leaf_pos</span>: <span class="self">self</span>.<span class="ident">leaf_pos</span>,
                 <span class="ident">path</span>: <span class="self">self</span>.<span class="ident">merkle_path</span>,
@@ -698,46 +717,52 @@
             <span class="kw">let</span> <span class="ident">computed_final_root</span> <span class="op">=</span>
                 <span class="ident">path</span>.<span class="ident">calculate_root</span>(<span class="ident">layouter</span>.<span class="ident">namespace</span>(<span class="op">|</span><span class="op">|</span> <span class="string">&quot;calculate root&quot;</span>), <span class="ident">leaf</span>)<span class="question-mark">?</span>;
 
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">leaf_pos</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">leaf_pos</span> {
-                <span class="comment">// The expected final root</span>
-                <span class="kw">let</span> <span class="ident">final_root</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">merkle_path</span>.<span class="ident">unwrap</span>().<span class="ident">iter</span>().<span class="ident">enumerate</span>().<span class="ident">fold</span>(
-                    <span class="self">self</span>.<span class="ident">leaf</span>.<span class="ident">unwrap</span>(),
-                    <span class="op">|</span><span class="ident">node</span>, (<span class="ident">l</span>, <span class="ident">sibling</span>)<span class="op">|</span> {
-                        <span class="kw">let</span> <span class="ident">l</span> <span class="op">=</span> <span class="ident">l</span> <span class="kw">as</span> <span class="ident">u8</span>;
-                        <span class="kw">let</span> (<span class="ident">left</span>, <span class="ident">right</span>) <span class="op">=</span> <span class="kw">if</span> <span class="ident">leaf_pos</span> <span class="op">&amp;</span> (<span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="ident">l</span>) <span class="op">==</span> <span class="number">0</span> {
-                            (<span class="kw-2">&amp;</span><span class="ident">node</span>, <span class="ident">sibling</span>)
-                        } <span class="kw">else</span> {
-                            (<span class="ident">sibling</span>, <span class="kw-2">&amp;</span><span class="ident">node</span>)
-                        };
+            <span class="self">self</span>.<span class="ident">leaf</span>
+                .<span class="ident">zip</span>(<span class="self">self</span>.<span class="ident">leaf_pos</span>)
+                .<span class="ident">zip</span>(<span class="self">self</span>.<span class="ident">merkle_path</span>)
+                .<span class="ident">zip</span>(<span class="ident">computed_final_root</span>.<span class="ident">value</span>())
+                .<span class="ident">assert_if_known</span>(<span class="op">|</span>(((<span class="ident">leaf</span>, <span class="ident">leaf_pos</span>), <span class="ident">merkle_path</span>), <span class="ident">computed_final_root</span>)<span class="op">|</span> {
+                    <span class="comment">// The expected final root</span>
+                    <span class="kw">let</span> <span class="ident">final_root</span> <span class="op">=</span>
+                        <span class="ident">merkle_path</span>
+                            .<span class="ident">iter</span>()
+                            .<span class="ident">enumerate</span>()
+                            .<span class="ident">fold</span>(<span class="kw-2">*</span><span class="ident">leaf</span>, <span class="op">|</span><span class="ident">node</span>, (<span class="ident">l</span>, <span class="ident">sibling</span>)<span class="op">|</span> {
+                                <span class="kw">let</span> <span class="ident">l</span> <span class="op">=</span> <span class="ident">l</span> <span class="kw">as</span> <span class="ident">u8</span>;
+                                <span class="kw">let</span> (<span class="ident">left</span>, <span class="ident">right</span>) <span class="op">=</span> <span class="kw">if</span> <span class="ident">leaf_pos</span> <span class="op">&amp;</span> (<span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="ident">l</span>) <span class="op">==</span> <span class="number">0</span> {
+                                    (<span class="kw-2">&amp;</span><span class="ident">node</span>, <span class="ident">sibling</span>)
+                                } <span class="kw">else</span> {
+                                    (<span class="ident">sibling</span>, <span class="kw-2">&amp;</span><span class="ident">node</span>)
+                                };
 
-                        <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::primitives::sinsemilla</span>;
-                        <span class="kw">let</span> <span class="ident">merkle_crh</span> <span class="op">=</span> <span class="ident">sinsemilla::HashDomain::from_Q</span>(<span class="ident">TestHashDomain</span>.<span class="ident">Q</span>().<span class="ident">into</span>());
+                                <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::sinsemilla::primitives</span> <span class="kw">as</span> <span class="ident">sinsemilla</span>;
+                                <span class="kw">let</span> <span class="ident">merkle_crh</span> <span class="op">=</span>
+                                    <span class="ident">sinsemilla::HashDomain::from_Q</span>(<span class="ident">TestHashDomain</span>.<span class="ident">Q</span>().<span class="ident">into</span>());
 
-                        <span class="ident">merkle_crh</span>
-                            .<span class="ident">hash</span>(
-                                <span class="ident">iter::empty</span>()
-                                    .<span class="ident">chain</span>(<span class="ident">i2lebsp</span>::<span class="op">&lt;</span><span class="number">10</span><span class="op">&gt;</span>(<span class="ident">l</span> <span class="kw">as</span> <span class="ident">u64</span>).<span class="ident">iter</span>().<span class="ident">copied</span>())
-                                    .<span class="ident">chain</span>(
-                                        <span class="ident">left</span>.<span class="ident">to_le_bits</span>()
-                                            .<span class="ident">iter</span>()
-                                            .<span class="ident">by_val</span>()
-                                            .<span class="ident">take</span>(<span class="ident">pallas::Base::NUM_BITS</span> <span class="kw">as</span> <span class="ident">usize</span>),
+                                <span class="ident">merkle_crh</span>
+                                    .<span class="ident">hash</span>(
+                                        <span class="ident">iter::empty</span>()
+                                            .<span class="ident">chain</span>(<span class="ident">i2lebsp</span>::<span class="op">&lt;</span><span class="number">10</span><span class="op">&gt;</span>(<span class="ident">l</span> <span class="kw">as</span> <span class="ident">u64</span>).<span class="ident">iter</span>().<span class="ident">copied</span>())
+                                            .<span class="ident">chain</span>(
+                                                <span class="ident">left</span>.<span class="ident">to_le_bits</span>()
+                                                    .<span class="ident">iter</span>()
+                                                    .<span class="ident">by_vals</span>()
+                                                    .<span class="ident">take</span>(<span class="ident">pallas::Base::NUM_BITS</span> <span class="kw">as</span> <span class="ident">usize</span>),
+                                            )
+                                            .<span class="ident">chain</span>(
+                                                <span class="ident">right</span>
+                                                    .<span class="ident">to_le_bits</span>()
+                                                    .<span class="ident">iter</span>()
+                                                    .<span class="ident">by_vals</span>()
+                                                    .<span class="ident">take</span>(<span class="ident">pallas::Base::NUM_BITS</span> <span class="kw">as</span> <span class="ident">usize</span>),
+                                            ),
                                     )
-                                    .<span class="ident">chain</span>(
-                                        <span class="ident">right</span>
-                                            .<span class="ident">to_le_bits</span>()
-                                            .<span class="ident">iter</span>()
-                                            .<span class="ident">by_val</span>()
-                                            .<span class="ident">take</span>(<span class="ident">pallas::Base::NUM_BITS</span> <span class="kw">as</span> <span class="ident">usize</span>),
-                                    ),
-                            )
-                            .<span class="ident">unwrap_or</span>(<span class="ident">pallas::Base::zero</span>())
-                    },
-                );
+                                    .<span class="ident">unwrap_or</span>(<span class="ident">pallas::Base::zero</span>())
+                            });
 
-                <span class="comment">// Check the computed final root against the expected final root.</span>
-                <span class="macro">assert_eq!</span>(<span class="ident">computed_final_root</span>.<span class="ident">value</span>().<span class="ident">unwrap</span>(), <span class="kw-2">&amp;</span><span class="ident">final_root</span>);
-            }
+                    <span class="comment">// Check the computed final root against the expected final root.</span>
+                    <span class="ident">computed_final_root</span> <span class="op">==</span> <span class="op">&amp;&amp;</span><span class="ident">final_root</span>
+                });
 
             <span class="prelude-val">Ok</span>(())
         }
@@ -759,9 +784,9 @@
         <span class="comment">// The root is provided as a public input in the Orchard circuit.</span>
 
         <span class="kw">let</span> <span class="ident">circuit</span> <span class="op">=</span> <span class="ident">MyCircuit</span> {
-            <span class="ident">leaf</span>: <span class="prelude-val">Some</span>(<span class="ident">leaf</span>),
-            <span class="ident">leaf_pos</span>: <span class="prelude-val">Some</span>(<span class="ident">pos</span>),
-            <span class="ident">merkle_path</span>: <span class="prelude-val">Some</span>(<span class="ident">path</span>.<span class="ident">try_into</span>().<span class="ident">unwrap</span>()),
+            <span class="ident">leaf</span>: <span class="ident">Value::known</span>(<span class="ident">leaf</span>),
+            <span class="ident">leaf_pos</span>: <span class="ident">Value::known</span>(<span class="ident">pos</span>),
+            <span class="ident">merkle_path</span>: <span class="ident">Value::known</span>(<span class="ident">path</span>.<span class="ident">try_into</span>().<span class="ident">unwrap</span>()),
         };
 
         <span class="kw">let</span> <span class="ident">prover</span> <span class="op">=</span> <span class="ident">MockProver::run</span>(<span class="number">11</span>, <span class="kw-2">&amp;</span><span class="ident">circuit</span>, <span class="macro">vec!</span>[]).<span class="ident">unwrap</span>();
@@ -785,5 +810,4 @@
     }
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="halo2_gadgets" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.60.0-nightly (ee5d8d37b 2022-01-17)" ></div>
-</body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="halo2_gadgets" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (20ffea693 2022-08-11)" ></div></body></html>
